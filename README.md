@@ -1,6 +1,6 @@
-# Unreal Angelscript Clang-Format
+# Unreal AngelScript Clang-Format
 
-Format Unreal Engine Angelscript code using Clang-Format
+Format Unreal Engine AngelScript code using Clang-Format
 
 <br>
 

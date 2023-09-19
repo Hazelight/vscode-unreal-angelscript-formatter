@@ -1,7 +1,7 @@
 {
   "name": "unreal-angelscript-clang-format",
-  "displayName": "Unreal Angelscript Clang-Format",
-  "description": "Format Unreal Engine Angelscript code using Clang-Format",
+  "displayName": "Unreal AngelScript Clang-Format",
+  "description": "Format Unreal Engine AngelScript code using Clang-Format",
   "publisher": "Hazelight",
   "version": "0.1.3",
   "engines": {
@@ -16,7 +16,7 @@
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
-      "title": "Unreal Angelscript Clang-Format",
+      "title": "Unreal AngelScript Clang-Format",
       "properties": {
         "unreal-angelscript-clang-format.executable": {
           "type": "string",
