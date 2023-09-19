@@ -7,8 +7,14 @@
   "engines": {
     "vscode": "^1.77.0"
   },
+  "keywords": [
+    "unreal",
+    "engine",
+    "angelscript",
+    "ue5"
+  ],
   "categories": [
-    "Other"
+    "Formatters"
   ],
   "activationEvents": [
     "onLanguage:angelscript"
