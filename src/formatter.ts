@@ -107,7 +107,8 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                     editInfo.offset = codeByteOffsetCache.offset + documentTextBuffer.slice(codeByteOffsetCache.byte, offset).toString("utf8").length;
                     codeByteOffsetCache.byte = offset;
                     codeByteOffsetCache.offset = editInfo.offset;
-                } else {
+                }
+                else {
                     editInfo.offset = documentTextBuffer.slice(0, offset).toString("utf8").length;
                     codeByteOffsetCache.byte = offset;
                     codeByteOffsetCache.offset = editInfo.offset;
@@ -182,7 +183,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
     }
 
     /**
-     * Format the given document
+     * Get formatting edits for a document
      * @param document The document to format
      * @param range The range to format, or null to format the whole document
      * @param options Formatting options
@@ -215,7 +216,14 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                 clangFormatArguments.push(`-offset=${offset}`, `-length=${length}`);
             }
 
-            let workingPath = document.isUntitled ? vscode.workspace.workspaceFolders![0].uri.fsPath : path.dirname(document.fileName);
+            let workingPath = undefined;
+            if (document.isUntitled) {
+                if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0)
+                    workingPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+            }
+            else {
+                workingPath = path.dirname(document.fileName);
+            }
 
             let stdout = "";
             let stderr = "";

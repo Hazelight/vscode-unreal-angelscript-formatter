@@ -30,7 +30,11 @@ export function getConfigPath(config: string) {
 
     // If path isn't absolute, make it relative to the workspace root
     if (!path.isAbsolute(value)) {
-        const workspaceRoot = vscode.workspace.workspaceFolders![0].uri.fsPath;
+        if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+            return undefined;
+        }
+
+        const workspaceRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
         value = path.join(workspaceRoot, value);
     }
 
@@ -62,7 +66,7 @@ export function getDefaultStyleFilepath(extensionPath: string) {
  */
 export function getClangStyle(extensionPath: string) {
     let styleFilepath = getConfigPath("style");
-    
+
     // TODO: Warn user if style file doesn't exist
     if (!styleFilepath || !fs.existsSync(styleFilepath)) {
         styleFilepath = getDefaultStyleFilepath(extensionPath);
