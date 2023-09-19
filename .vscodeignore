@@ -8,3 +8,6 @@ src/**
 **/*.map
 **/*.ts
 build_scripts/**
+
+node_modules/
+!node_modules/**/[lL][iI][cC][eE][nN][sS][eE]*
