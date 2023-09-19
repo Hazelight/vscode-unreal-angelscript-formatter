@@ -8,6 +8,13 @@ import * as utils from './utils';
 import sax = require('sax');
 
 
+interface IEditInfo {
+    length: number;
+    offset: number;
+    text: string;
+}
+
+
 export class AngelscriptClangDocumentFormattingEditProvider implements vscode.DocumentFormattingEditProvider, vscode.DocumentRangeFormattingEditProvider {
 
     private readonly memberKeywords = ["private", "protected", "delegate"];
@@ -31,7 +38,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
      * @param editRange The range of the edit
      * @returns True if the edit should be applied, false otherwise
      */
-    private allowEdit(document: vscode.TextDocument, edit: { length: number, offset: number, text: string }, editRange: vscode.Range) {
+    private allowEdit(document: vscode.TextDocument, edit: IEditInfo, editRange: vscode.Range) {
         if (editRange.isSingleLine) {
             const line = document.lineAt(editRange.start.line);
             const lineTrimmedText = line.text.trim();
@@ -83,7 +90,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             });
 
             const edits: vscode.TextEdit[] = [];
-            let currentEdit: { length: number, offset: number, text: string } | null;
+            let currentEdit: IEditInfo | null;
 
             const documentTextBuffer = Buffer.from(documentText);
 
