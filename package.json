@@ -42,6 +42,9 @@
     "type": "git",
     "url": "https://github.com/Hazelight/vscode-unreal-angelscript-formatter"
   },
+  "bugs": {
+    "url": "https://github.com/Hazelight/vscode-unreal-angelscript-formatter/issues"
+  },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
     "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
