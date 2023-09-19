@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import { AngelscriptClangDocumentFormattingEditProvider } from "./formatter";
 
+
 export function activate(context: vscode.ExtensionContext) {
 
 	const formatter = new AngelscriptClangDocumentFormattingEditProvider(context);
@@ -15,5 +16,5 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 }
 
-// This method is called when your extension is deactivated
+
 export function deactivate() { }

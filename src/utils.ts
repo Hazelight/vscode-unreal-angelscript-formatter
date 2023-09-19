@@ -1,7 +1,12 @@
 import * as vscode from 'vscode';
+
 import * as path from 'path';
+import * as fs from 'fs';
+
 
 export const EXTENSION_ID = "unreal-angelscript-clang-format";
+export const EXECUTABLE_CONFIG_KEY = 'executable';
+
 
 /**
  * Get this extension configuration
@@ -35,8 +40,60 @@ export function getConfigPath(config: string) {
 
 /**
  * Open the settings and filter the given property
- * @param property The property to search for
+ * @param config The config key to search for, should not include the extension ID
  */
-export function openExtensionSetting(property: string) {
-    vscode.commands.executeCommand('workbench.action.openSettings', `${EXTENSION_ID}.${property}`);
+export function openExtensionConfig(config: string) {
+    vscode.commands.executeCommand('workbench.action.openSettings', `${EXTENSION_ID}.${config}`);
+}
+
+
+/**
+ * Get the path to the default clang-format style file
+ * @param extensionPath The extension's installation path
+ */
+export function getDefaultStyleFilepath(extensionPath: string) {
+    return path.join(extensionPath, "resources", "default-style", ".clang-format");
+}
+
+
+/**
+ * Get the path to the clang-format style file
+ * @param extensionPath The extension's installation path
+ */
+export function getClangStyle(extensionPath: string) {
+    let styleFilepath = getConfigPath("style");
+    
+    // TODO: Warn user if style file doesn't exist
+    if (!styleFilepath || !fs.existsSync(styleFilepath)) {
+        styleFilepath = getDefaultStyleFilepath(extensionPath);
+    }
+
+    return `file:${styleFilepath}`;
+}
+
+
+/**
+ * @returns The path to the clang-format executable, or null if it doesn't exist
+ */
+export function getClangExecutable() {
+    let clangExecutable = getConfigPath(EXECUTABLE_CONFIG_KEY);
+    if (!clangExecutable) {
+        // If user hasn't set a path, assume clang-format is in the PATH
+        return "clang-format";
+    }
+
+    if (fs.existsSync(clangExecutable)) {
+        return clangExecutable;
+    }
+
+    vscode.window.showErrorMessage(
+        `File ${clangExecutable} does not exist. Please update the \`${EXTENSION_ID}.${EXECUTABLE_CONFIG_KEY}\` configuration`,
+        "Open settings"
+    ).then((value) => {
+        if (value === "Open settings") {
+            openExtensionConfig(EXECUTABLE_CONFIG_KEY);
+        }
+    });
+
+    return null;
 }

@@ -4,63 +4,17 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 
 import * as utils from './utils';
-import * as fs from 'fs';
 
 import sax = require('sax');
-
-const EXECUTABLE_CONFIG_KEY = 'executable';
-
-
-function getDefaultStyleFilepath(extensionPath: string) {
-    return path.join(extensionPath, "resources", "default-style", ".clang-format");
-}
-
-
-/**
- * @returns The path to the clang-format executable
- */
-function getClangStyle(extensionPath: string) {
-    let styleFilepath = utils.getConfigPath("style");
-    if (!styleFilepath || !fs.existsSync(styleFilepath)) {
-        styleFilepath = getDefaultStyleFilepath(extensionPath);
-    }
-
-    return `file:${styleFilepath}`;
-}
-
-
-function getClangExecutable() {
-    let clangExecutable = utils.getConfigPath(EXECUTABLE_CONFIG_KEY);
-    if (!clangExecutable) {
-        // Assume clang-format is in the PATH
-        return "clang-format";
-    }
-
-    if (fs.existsSync(clangExecutable)) {
-        return clangExecutable;
-    }
-
-    vscode.window.showErrorMessage(
-        `File ${clangExecutable} does not exist. Please update the \`${utils.EXTENSION_ID}.${EXECUTABLE_CONFIG_KEY}\` configuration`,
-        "Open settings"
-    ).then((pressedBtn) => {
-        if (pressedBtn === "Open settings") {
-            utils.openExtensionSetting(EXECUTABLE_CONFIG_KEY);
-        }
-    });
-
-    return null;
-}
-
 
 
 export class AngelscriptClangDocumentFormattingEditProvider implements vscode.DocumentFormattingEditProvider, vscode.DocumentRangeFormattingEditProvider {
 
-    readonly memberKeywords = ["private", "protected", "delegate"];
+    private readonly memberKeywords = ["private", "protected", "delegate"];
 
     constructor(
         private readonly context: vscode.ExtensionContext
-    ) {}
+    ) { }
 
     public provideDocumentFormattingEdits(document: vscode.TextDocument, options: vscode.FormattingOptions, token: vscode.CancellationToken): Thenable<vscode.TextEdit[]> {
         return this.formatDocument(document, null, options, token);
@@ -71,35 +25,32 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
     }
 
     /**
-     * Check if an edit should be applied, Angelscript has some cases that differ from C++, so we need to filter out some edits
-     * @param document 
-     * @param edit 
-     * @param editRange 
-     * @returns 
+     * Check if an edit should be applied. AngelScript has some cases that differ from C++, so we need to filter out some edits
+     * @param document The document being formatted
+     * @param edit The edit to check
+     * @param editRange The range of the edit
+     * @returns True if the edit should be applied, false otherwise
      */
     private allowEdit(document: vscode.TextDocument, edit: { length: number, offset: number, text: string }, editRange: vscode.Range) {
-        
         if (editRange.isSingleLine) {
             const line = document.lineAt(editRange.start.line);
             const lineTrimmedText = line.text.trim();
 
+            // Prevent certain spaces from being added
             if (edit.length === 0 && edit.text === " ") {
                 const testRange = new vscode.Range(
                     new vscode.Position(editRange.start.line, editRange.start.character - 1),
                     new vscode.Position(editRange.end.line, line.range.end.character)
-                    );
-                    const text = document.getText(testRange);
-                    
-                // Prevent spaces from being added between string prefixes and the string
-                if (text.match(/^[A-z][\'\"]/)) {
-                    return false;
-                }
-                
-                // Prevent spaces from being added between & and "in" or "out"
-                if (text.match(/^&(in|out)/)) {
-                    return false;
-                }
+                );
+                const text = document.getText(testRange);
 
+                // Prevent spaces from being added between string prefixes and the string (e.g. f-strings)
+                if (text.match(/^[A-z][\'\"]/))
+                    return false;
+
+                // Prevent spaces from being added between & and "in" or "out"
+                if (text.match(/^&(in|out)/))
+                    return false;
             }
 
             // Prevent new lines after these keywords
@@ -110,16 +61,21 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             }
 
             // Don't format access: lines, these are a bit special
-            if (lineTrimmedText.match(/^access\s*:/)) {
+            if (lineTrimmedText.match(/^access\s*:/))
                 return false;
-            }
         }
 
         return true;
     }
 
-
-    private getEdits(document: vscode.TextDocument, xml: string, codeContent: string): Thenable<vscode.TextEdit[]> {
+    /**
+     * Construct vscode.TextEdit objects from the clang-format xml output
+     * @param document The document being formatted
+     * @param xml The xml output from clang-format
+     * @param documentText The text of the document
+     * @returns An array of vscode.TextEdit objects that should be applied to the document
+     */
+    private getEdits(document: vscode.TextDocument, xml: string, documentText: string): Thenable<vscode.TextEdit[]> {
         return new Promise((resolve, reject) => {
             const parser = sax.parser(true, {
                 trim: false,
@@ -129,7 +85,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             const edits: vscode.TextEdit[] = [];
             let currentEdit: { length: number, offset: number, text: string } | null;
 
-            const codeBuffer = Buffer.from(codeContent);
+            const documentTextBuffer = Buffer.from(documentText);
 
             // encoding position cache
             let codeByteOffsetCache = {
@@ -141,16 +97,16 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                 const length = editInfo.length;
 
                 if (offset >= codeByteOffsetCache.byte) {
-                    editInfo.offset = codeByteOffsetCache.offset + codeBuffer.slice(codeByteOffsetCache.byte, offset).toString("utf8").length;
+                    editInfo.offset = codeByteOffsetCache.offset + documentTextBuffer.slice(codeByteOffsetCache.byte, offset).toString("utf8").length;
                     codeByteOffsetCache.byte = offset;
                     codeByteOffsetCache.offset = editInfo.offset;
                 } else {
-                    editInfo.offset = codeBuffer.slice(0, offset).toString("utf8").length;
+                    editInfo.offset = documentTextBuffer.slice(0, offset).toString("utf8").length;
                     codeByteOffsetCache.byte = offset;
                     codeByteOffsetCache.offset = editInfo.offset;
                 }
 
-                editInfo.length = codeBuffer.slice(offset, offset + length).toString("utf8").length;
+                editInfo.length = documentTextBuffer.slice(offset, offset + length).toString("utf8").length;
 
                 return editInfo;
             };
@@ -180,7 +136,6 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                     default:
                         reject(`Unexpected tag ${tag.name}`);
                 }
-
             };
 
             parser.ontext = (text) => {
@@ -216,24 +171,30 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
 
             parser.write(xml);
             parser.end();
-
         });
     }
 
-
+    /**
+     * Format the given document
+     * @param document The document to format
+     * @param range The range to format, or null to format the whole document
+     * @param options Formatting options
+     * @param token Cancellation token
+     * @returns A promise that resolves to the edits
+     */
     private formatDocument(document: vscode.TextDocument, range: vscode.Range | null, options: vscode.FormattingOptions, token: vscode.CancellationToken): Thenable<vscode.TextEdit[]> {
         return new Promise((resolve, reject) => {
             // Get the clang executable
-            const clangExecutable = getClangExecutable();
+            const clangExecutable = utils.getClangExecutable();
             if (!clangExecutable) {
                 return reject("No clang-format executable");
             }
 
-            const code = document.getText();
+            const documentText = document.getText();
 
             let clangFormatArguments = [
                 "-output-replacements-xml",
-                `-style=${getClangStyle(this.context.extensionPath)}`,
+                `-style=${utils.getClangStyle(this.context.extensionPath)}`,
                 `-assume-filename=${document.fileName}`
             ];
 
@@ -241,8 +202,8 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                 let offset = document.offsetAt(range.start);
                 let length = document.offsetAt(range.end) - offset;
 
-                length = Buffer.byteLength(code.slice(offset, offset + length), "utf8");
-                offset = Buffer.byteLength(code.slice(0, offset), "utf8");
+                length = Buffer.byteLength(documentText.slice(offset, offset + length), "utf8");
+                offset = Buffer.byteLength(documentText.slice(0, offset), "utf8");
 
                 clangFormatArguments.push(`-offset=${offset}`, `-length=${length}`);
             }
@@ -252,7 +213,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             let stdout = "";
             let stderr = "";
             const clangProcess = child_process.spawn(clangExecutable, clangFormatArguments, { cwd: workingPath });
-            clangProcess.stdin.end(code);
+            clangProcess.stdin.end(documentText);
             clangProcess.stdout.on('data', chunk => stdout += chunk);
             clangProcess.stderr.on('data', chunk => stderr += chunk);
 
@@ -260,11 +221,11 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             clangProcess.on('error', err => {
                 if (err && (<any>err).code === 'ENOENT') {
                     vscode.window.showErrorMessage(
-                        `Failed to run '${clangExecutable}'. Please update the \`${utils.EXTENSION_ID}.${EXECUTABLE_CONFIG_KEY}\` configuration`,
+                        `Failed to run '${clangExecutable}'. Please update the \`${utils.EXTENSION_ID}.${utils.EXECUTABLE_CONFIG_KEY}\` configuration`,
                         "Open settings"
                     ).then((pressedBtn) => {
                         if (pressedBtn === "Open settings") {
-                            utils.openExtensionSetting(EXECUTABLE_CONFIG_KEY);
+                            utils.openExtensionConfig(utils.EXECUTABLE_CONFIG_KEY);
                         }
                     });
 
@@ -285,7 +246,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                         return reject();
                     }
 
-                    return resolve(this.getEdits(document, stdout, code));
+                    return resolve(this.getEdits(document, stdout, documentText));
                 } catch (e) {
                     reject(e);
                 }
