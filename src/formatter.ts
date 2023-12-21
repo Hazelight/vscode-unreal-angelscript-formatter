@@ -17,7 +17,7 @@ interface IEditInfo {
 
 export class AngelscriptClangDocumentFormattingEditProvider implements vscode.DocumentFormattingEditProvider, vscode.DocumentRangeFormattingEditProvider {
 
-    private readonly memberKeywords = ["private", "protected", "delegate"];
+    private readonly memberKeywords = ["private", "protected", "delegate", "event"];
 
     constructor(
         private readonly context: vscode.ExtensionContext
@@ -62,7 +62,8 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
 
             // Prevent new lines after these keywords
             for (const keyword of this.memberKeywords) {
-                if (editRange.isSingleLine && lineTrimmedText.startsWith(`${keyword} `) && edit.text.includes("\n")) {
+                const regex = new RegExp(`^${keyword}\\s`);
+                if (editRange.isSingleLine && regex.test(lineTrimmedText) && edit.text.includes("\n")) {
                     return false;
                 }
             }
