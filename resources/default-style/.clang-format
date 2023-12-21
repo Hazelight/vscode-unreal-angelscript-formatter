@@ -1,3 +1,5 @@
+# See: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+
 Standard: C++11
 
 StatementMacros: ["UCLASS", "UPROPERTY", "UFUNCTION", "USTRUCT", "UENUM"]

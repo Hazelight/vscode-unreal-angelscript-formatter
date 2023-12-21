@@ -3,7 +3,7 @@
   "displayName": "Unreal AngelScript Clang-Format",
   "description": "Format Unreal Engine AngelScript code using Clang-Format",
   "publisher": "Hazelight",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "engines": {
     "vscode": "^1.77.0"
   },
@@ -21,18 +21,25 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "unreal-angelscript-clang-format.generate-config-file",
+        "category": "Unreal AngelScript Clang-Format",
+        "title": "Generate Config File"
+      }
+    ],
     "configuration": {
       "title": "Unreal AngelScript Clang-Format",
       "properties": {
         "unreal-angelscript-clang-format.executable": {
           "type": "string",
           "default": "",
-          "description": "Path to clang-format.exe executable",
+          "description": "Path to clang-format.exe executable, can be relative to workspace root or absolute",
           "scope": "resource"
         },
         "unreal-angelscript-clang-format.style": {
           "type": "string",
-          "description": "Path to a .clang-format style file",
+          "description": "Path to a .clang-format style file, can be relative to workspace root or absolute",
           "scope": "resource"
         }
       }
