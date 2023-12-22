@@ -2,7 +2,7 @@
 
 Standard: C++11
 
-StatementMacros: ["UCLASS", "UPROPERTY", "UFUNCTION", "USTRUCT", "UENUM"]
+StatementMacros: ["UCLASS", "UENUM", "UFUNCTION", "UPROPERTY", "USTRUCT"]
 
 # Indentation
 TabWidth: 4

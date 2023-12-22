@@ -34,12 +34,12 @@
         "unreal-angelscript-clang-format.executable": {
           "type": "string",
           "default": "",
-          "description": "Path to clang-format.exe executable, can be relative to workspace root or absolute",
+          "description": "Path to clang-format.exe executable, can be absolute or relative to the workspace",
           "scope": "resource"
         },
         "unreal-angelscript-clang-format.style": {
           "type": "string",
-          "description": "Path to a .clang-format style file, can be relative to workspace root or absolute",
+          "description": "Path to a .clang-format style file, can be absolute or relative to the workspace",
           "scope": "resource"
         }
       }

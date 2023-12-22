@@ -48,7 +48,6 @@ export async function generateConfigFile(extensionPath: string) {
         "Open settings");
 
     if (selectedValue === "Open settings") {
-        vscode.commands.executeCommand("workbench.action.openSettings", `${utils.EXTENSION_ID}.style`);
+        utils.openExtensionConfig("style");
     }
 }
-
