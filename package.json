@@ -33,7 +33,6 @@
       "properties": {
         "unreal-angelscript-clang-format.executable": {
           "type": "string",
-          "default": "",
           "description": "Path to clang-format.exe executable, can be absolute or relative to the workspace",
           "scope": "resource"
         },
