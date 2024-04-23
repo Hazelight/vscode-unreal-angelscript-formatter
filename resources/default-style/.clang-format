@@ -51,7 +51,6 @@ AlignTrailingComments:
 
 AlignAfterOpenBracket: Align
 AlignEscapedNewlines: Left
-AlignTrailingComments: true
 AllowShortBlocksOnASingleLine: Empty
 AllowShortEnumsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
