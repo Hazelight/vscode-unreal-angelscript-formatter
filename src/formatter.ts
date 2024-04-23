@@ -62,6 +62,15 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                     return false;
             }
 
+            // Prevent new lines after function return types
+            // This can happen if you have e.g. a struct that you don't close with a semicolon, followed by a function
+            if (lineTrimmedText.match(/^([A-z_])+\s+([A-z0-9_])+\s*\(/)) {
+                if (edit.text.includes("\n")) {
+                    return false;
+                }
+            }
+
+
             // Prevent new lines after these keywords
             for (const keyword of this.memberKeywords) {
                 const regex = new RegExp(`^${keyword}\\s`);
