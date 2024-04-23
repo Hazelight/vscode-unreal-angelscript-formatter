@@ -4,9 +4,11 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 
 import * as utils from './utils';
+import { Logger } from './logger';
 
 import sax = require('sax');
 
+const POPUP_ERROR_MESSAGE = "Failed to format document";
 
 interface IEditInfo {
     length: number;
@@ -196,14 +198,16 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             // Get the clang executable
             const clangExecutable = utils.getClangExecutable();
             if (!clangExecutable) {
+                Logger.showErrorMessage("No clang-format executable found", `Could not locate a clang executable at "${clangExecutable}". Please update the \`${utils.EXTENSION_ID}.${utils.EXECUTABLE_CONFIG_KEY}\` configuration`);
                 return reject("No clang-format executable");
             }
 
             const documentText = document.getText();
 
+            const style = utils.getClangStyle(this.context.extensionPath);
             let clangFormatArguments = [
                 "-output-replacements-xml",
-                `-style=${utils.getClangStyle(this.context.extensionPath)}`,
+                `-style=${style}`,
                 `-assume-filename=${document.fileName}`
             ];
 
@@ -226,6 +230,8 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                 workingPath = path.dirname(document.fileName);
             }
 
+            Logger.log(`Running "${clangExecutable}" with arguments:\n${clangFormatArguments.join("\n")}`);
+
             let stdout = "";
             let stderr = "";
             const clangProcess = child_process.spawn(clangExecutable, clangFormatArguments, { cwd: workingPath });
@@ -233,11 +239,15 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             clangProcess.stdout.on('data', chunk => stdout += chunk);
             clangProcess.stderr.on('data', chunk => stderr += chunk);
 
+            let bHasShownError = false; // Prevent showing multiple error popups
+            
             // On error
             clangProcess.on('error', err => {
+                bHasShownError = true;
+
                 if (err && (<any>err).code === 'ENOENT') {
                     vscode.window.showErrorMessage(
-                        `Failed to run '${clangExecutable}'. Please update the \`${utils.EXTENSION_ID}.${utils.EXECUTABLE_CONFIG_KEY}\` configuration`,
+                        `Could not find '${clangExecutable}'. Please update the \`${utils.EXTENSION_ID}.${utils.EXECUTABLE_CONFIG_KEY}\` configuration`,
                         "Open settings"
                     ).then((pressedBtn) => {
                         if (pressedBtn === "Open settings") {
@@ -245,8 +255,11 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                         }
                     });
 
+                    Logger.log(err.message);
                     return reject("No clang-format executable");
                 }
+
+                Logger.showErrorMessage(POPUP_ERROR_MESSAGE, err.message);
 
                 return reject(err);
             });
@@ -255,10 +268,16 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             clangProcess.on("close", exitCode => {
                 try {
                     if (stderr.length !== 0) {
+                        Logger.showErrorMessage(POPUP_ERROR_MESSAGE, stderr);
                         return reject(stderr);
                     }
 
                     if (exitCode !== 0) {
+                        if (bHasShownError)
+                            Logger.log(`clang-format exited with code ${exitCode}`);
+                        else
+                            Logger.showErrorMessage(POPUP_ERROR_MESSAGE, `clang-format exited with code ${exitCode}`);
+
                         return reject();
                     }
 

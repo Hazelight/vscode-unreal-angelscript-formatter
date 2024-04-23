@@ -90,14 +90,5 @@ export function getClangExecutable() {
         return clangExecutable;
     }
 
-    vscode.window.showErrorMessage(
-        `File ${clangExecutable} does not exist. Please update the \`${EXTENSION_ID}.${EXECUTABLE_CONFIG_KEY}\` configuration`,
-        "Open settings"
-    ).then((value) => {
-        if (value === "Open settings") {
-            openExtensionConfig(EXECUTABLE_CONFIG_KEY);
-        }
-    });
-
     return null;
 }
