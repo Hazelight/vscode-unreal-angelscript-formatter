@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.1.5] - 2024-04-23
+
+### Added:
+- Logging & better error messages to help debug issues _(Logs can be found in the "Unreal Angelscript Formatter" output channel)_
+
+### Fixed:
+- Removed duplicate mapping key `AlignTrailingComments` in the default style [#1](https://github.com/Hazelight/vscode-unreal-angelscript-formatter/issues/1)
+- Potential unwanted new line inserted between a function's return type and name
+
 ## [0.1.4] - 2023-12-22
 
 ### Added:
