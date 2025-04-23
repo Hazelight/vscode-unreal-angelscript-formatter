@@ -43,7 +43,9 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
     private allowEdit(document: vscode.TextDocument, edit: IEditInfo, editRange: vscode.Range) {
         if (editRange.isSingleLine) {
             const line = document.lineAt(editRange.start.line);
-            const lineTrimmedText = line.text.trim();
+
+            const lineText = line.text;
+            const lineTextEdited = lineText.slice(0, editRange.start.character) + edit.text + lineText.slice(editRange.end.character);
 
             // Prevent certain spaces from being added
             if (edit.length === 0 && edit.text === " ") {
@@ -64,23 +66,23 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
 
             // Prevent new lines after function return types
             // This can happen if you have e.g. a struct that you don't close with a semicolon, followed by a function
-            if (lineTrimmedText.match(/^([A-z_])+\s+([A-z0-9_])+\s*\(/)) {
-                if (edit.text.includes("\n")) {
-                    return false;
-                }
+            if (lineText.match(/^\s*([A-z_])+\s+([A-z0-9_])+\s*\(/) &&
+                lineTextEdited.match(/^\s*([A-z_])+\r?\n([A-z0-9_])+\s*\(/) &&
+                edit.text.includes("\n")) {
+                return false;
             }
 
 
             // Prevent new lines after these keywords
             for (const keyword of this.memberKeywords) {
-                const regex = new RegExp(`^${keyword}\\s`);
-                if (editRange.isSingleLine && regex.test(lineTrimmedText) && edit.text.includes("\n")) {
+                const regex = new RegExp(`^\s*${keyword}\\s`);
+                if (editRange.isSingleLine && regex.test(lineText) && edit.text.includes("\n")) {
                     return false;
                 }
             }
 
             // Don't format access: lines, these are a bit special
-            if (lineTrimmedText.match(/^access\s*:/))
+            if (lineText.trim().match(/^\s*access\s*:/))
                 return false;
         }
 
@@ -249,7 +251,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             clangProcess.stderr.on('data', chunk => stderr += chunk);
 
             let bHasShownError = false; // Prevent showing multiple error popups
-            
+
             // On error
             clangProcess.on('error', err => {
                 bHasShownError = true;

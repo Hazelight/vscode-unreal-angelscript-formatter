@@ -3,6 +3,7 @@
 ## [1.0.0] - UNRELEASED
 
 - Output log is now of type `LogOutputChannel`, leading to improved readability
+- Fixed BraceWrapping: AfterFunction rule not working [#5](https://github.com/Hazelight/vscode-unreal-angelscript-formatter/issues/5)
 
 ## [0.1.5] - 2024-04-23
 
