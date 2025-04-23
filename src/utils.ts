@@ -8,11 +8,18 @@ export const EXTENSION_ID = "unreal-angelscript-clang-format";
 export const EXECUTABLE_CONFIG_KEY = 'executable';
 
 
+export function getActiveWorkspaceFolder(): vscode.WorkspaceFolder | undefined {
+    if (vscode.window.activeTextEditor) {
+        const activeDocument = vscode.window.activeTextEditor.document;
+        return vscode.workspace.getWorkspaceFolder(activeDocument.uri);
+    }
+}
+
 /**
  * Get this extension configuration
  */
 export function getExtensionConfig() {
-    return vscode.workspace.getConfiguration(EXTENSION_ID, vscode.window.activeTextEditor?.document.uri);
+    return vscode.workspace.getConfiguration(EXTENSION_ID, getActiveWorkspaceFolder()?.uri);
 }
 
 
@@ -30,11 +37,12 @@ export function getConfigPath(config: string) {
 
     // If path isn't absolute, make it relative to the workspace root
     if (!path.isAbsolute(value)) {
-        if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+        const activeWorkspaceFolder = getActiveWorkspaceFolder();
+        if (!activeWorkspaceFolder) {
             return undefined;
         }
 
-        const workspaceRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const workspaceRoot = activeWorkspaceFolder.uri.fsPath;
         value = path.join(workspaceRoot, value);
     }
 

@@ -2,6 +2,7 @@
 
 ## [1.0.0] - UNRELEASED
 
+- Added support for multi-root workspaces
 - Output log is now of type `LogOutputChannel`, leading to improved readability
 - Fixed BraceWrapping: AfterFunction rule not working [#5](https://github.com/Hazelight/vscode-unreal-angelscript-formatter/issues/5)
 - If `unreal-angelscript-clang-format.style` is set to an invalid filepath the extension will now show an error message instead of falling back to the default style
