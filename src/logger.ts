@@ -1,21 +1,17 @@
 import * as vscode from 'vscode';
 
 export class Logger {
-    private static _outputChannel: vscode.OutputChannel;
+    private static _outputChannel: vscode.LogOutputChannel;
 
-    public static log(message: string) {
+    public static get outputChannel(): vscode.LogOutputChannel {
         if (!this._outputChannel) {
-            this._outputChannel = vscode.window.createOutputChannel("Unreal AngelScript Formatter");
+            this._outputChannel = vscode.window.createOutputChannel("Unreal AngelScript Formatter", { log: true });
         }
-
-        const dateTimeStr = new Date().toLocaleString();
-
-        this._outputChannel.appendLine(`[${dateTimeStr}] ${message}`);
+        return this._outputChannel;
     }
 
-    public static show() {
-        if (this._outputChannel)
-            this._outputChannel.show();
+    public static log(message: string) {
+        this.outputChannel.appendLine(message);
     }
 
     /**
@@ -24,11 +20,11 @@ export class Logger {
      * @param fullMessage The full message to log in the output channel
      */
     public static showErrorMessage(message: string, fullMessage: string) {
-        this.log(fullMessage);
+        this.outputChannel.error(fullMessage);
 
         vscode.window.showErrorMessage(message, "Show Log").then((value) => {
             if (value === "Show Log") {
-                this.show();
+                this.outputChannel.show();
             }
         });
     }
