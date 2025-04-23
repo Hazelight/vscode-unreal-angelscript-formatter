@@ -41,17 +41,17 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
      * @returns True if the edit should be applied, false otherwise
      */
     private allowEdit(document: vscode.TextDocument, edit: IEditInfo, editRange: vscode.Range) {
+        const startLine = document.lineAt(editRange.start.line);
+
+        const startLineText = startLine.text;
+        const startLineTextEdited = startLineText.slice(0, editRange.start.character) + edit.text + startLineText.slice(editRange.end.character);
+        
         if (editRange.isSingleLine) {
-            const line = document.lineAt(editRange.start.line);
-
-            const lineText = line.text;
-            const lineTextEdited = lineText.slice(0, editRange.start.character) + edit.text + lineText.slice(editRange.end.character);
-
             // Prevent certain spaces from being added
             if (edit.length === 0 && edit.text === " ") {
                 const testRange = new vscode.Range(
                     new vscode.Position(editRange.start.line, editRange.start.character - 1),
-                    new vscode.Position(editRange.end.line, line.range.end.character)
+                    new vscode.Position(editRange.end.line, startLine.range.end.character)
                 );
                 const text = document.getText(testRange);
 
@@ -66,8 +66,8 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
 
             // Prevent new lines after function return types
             // This can happen if you have e.g. a struct that you don't close with a semicolon, followed by a function
-            if (lineText.match(/^\s*([A-z_])+\s+([A-z0-9_])+\s*\(/) &&
-                lineTextEdited.match(/^\s*([A-z_])+\r?\n([A-z0-9_])+\s*\(/) &&
+            if (startLineText.match(/^\s*([A-z_])+\s+([A-z0-9_])+\s*\(/) &&
+                startLineTextEdited.match(/^\s*([A-z_])+\r?\n\s*([A-z0-9_])+\s*\(/) &&
                 edit.text.includes("\n")) {
                 return false;
             }
@@ -76,16 +76,16 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             // Prevent new lines after these keywords
             for (const keyword of this.memberKeywords) {
                 const regex = new RegExp(`^\s*${keyword}\\s`);
-                if (editRange.isSingleLine && regex.test(lineText) && edit.text.includes("\n")) {
+                if (editRange.isSingleLine && regex.test(startLineText) && edit.text.includes("\n")) {
                     return false;
                 }
             }
-
-            // Don't format access: lines, these are a bit special
-            if (lineText.trim().match(/^\s*access\s*:/))
-                return false;
         }
-
+    
+        // Don't format access: lines, these are a bit special
+        if (startLineText.trim().match(/^\s*access\s*:/))
+            return false;
+        
         return true;
     }
 
