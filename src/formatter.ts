@@ -209,7 +209,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             // Get the clang executable
             const clangExecutable = utils.getClangExecutable();
             if (!clangExecutable) {
-                Logger.showErrorMessage("No clang-format executable found", `Could not locate a clang executable at "${clangExecutable}". Please update the \`${utils.EXTENSION_ID}.${utils.EXECUTABLE_CONFIG_KEY}\` configuration`);
+                Logger.showErrorMessage("No clang-format executable found", Error(`Could not locate a clang executable at "${clangExecutable}". Please update the \`${utils.EXTENSION_ID}.${utils.EXECUTABLE_CONFIG_KEY}\` configuration`));
                 return reject("No clang-format executable");
             }
 
@@ -270,7 +270,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                     return reject("No clang-format executable");
                 }
 
-                Logger.showErrorMessage(POPUP_ERROR_MESSAGE, err.message);
+                Logger.showErrorMessage(POPUP_ERROR_MESSAGE, err);
 
                 return reject(err);
             });
@@ -279,7 +279,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             clangProcess.on("close", exitCode => {
                 try {
                     if (stderr.length !== 0) {
-                        Logger.showErrorMessage(POPUP_ERROR_MESSAGE, stderr);
+                        Logger.showErrorMessage(POPUP_ERROR_MESSAGE, Error(stderr));
                         return reject(stderr);
                     }
 
@@ -287,7 +287,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                         if (bHasShownError)
                             Logger.log(`clang-format exited with code ${exitCode}`);
                         else
-                            Logger.showErrorMessage(POPUP_ERROR_MESSAGE, `clang-format exited with code ${exitCode}`);
+                            Logger.showErrorMessage(POPUP_ERROR_MESSAGE, Error(`clang-format exited with code ${exitCode}`));
 
                         return reject();
                     }

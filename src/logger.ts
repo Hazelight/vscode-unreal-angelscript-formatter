@@ -17,10 +17,10 @@ export class Logger {
     /**
      * Shows an error dialog with the given message and logs the full message in the output channel
      * @param message The message to show in the error dialog
-     * @param fullMessage The full message to log in the output channel
+     * @param error The error.message will logged to the output channel
      */
-    public static showErrorMessage(message: string, fullMessage: string) {
-        this.outputChannel.error(fullMessage);
+    public static showErrorMessage(message: string, error: Error) {
+        this.outputChannel.error(`${error.name} ${error.message}`);
 
         vscode.window.showErrorMessage(message, "Show Log").then((value) => {
             if (value === "Show Log") {
