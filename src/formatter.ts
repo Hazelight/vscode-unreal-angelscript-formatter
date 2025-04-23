@@ -215,7 +215,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
 
             const documentText = document.getText();
 
-            const style = utils.getClangStyle(this.context.extensionPath);
+            const style = utils.getClangStyle(this.context.extensionUri);
             let clangFormatArguments = [
                 "-output-replacements-xml",
                 `-style=${style}`,

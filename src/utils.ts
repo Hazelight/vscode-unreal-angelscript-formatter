@@ -63,8 +63,8 @@ export function openExtensionConfig(config: string) {
  * Get the path to the default clang-format style file
  * @param extensionPath The extension's installation path
  */
-export function getDefaultStyleFilepath(extensionPath: string) {
-    return path.join(extensionPath, "resources", "default-style", ".clang-format");
+export function getDefaultStyleFilepath(extensionUri: vscode.Uri): vscode.Uri {
+    return vscode.Uri.joinPath(extensionUri, "resources", "default-style", ".clang-format");
 }
 
 
@@ -72,8 +72,8 @@ export function getDefaultStyleFilepath(extensionPath: string) {
  * Get the path to the clang-format style file
  * @param extensionPath The extension's installation path
  */
-export function getClangStyle(extensionPath: string) {
-    const styleFilepath = getConfigPath("style") || getDefaultStyleFilepath(extensionPath);
+export function getClangStyle(extensionPath: vscode.Uri) {
+    const styleFilepath = getConfigPath("style") || getDefaultStyleFilepath(extensionPath).fsPath;
     return `file:${styleFilepath}`;
 }
 
@@ -93,4 +93,14 @@ export function getClangExecutable() {
     }
 
     return null;
+}
+
+
+export async function uriExists(uri: vscode.Uri): Promise<boolean> {
+    try {
+        await vscode.workspace.fs.stat(uri);
+        return true;
+    } catch (e) {
+        return false;
+    }
 }

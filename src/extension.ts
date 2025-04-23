@@ -5,7 +5,7 @@ import { AngelscriptClangDocumentFormattingEditProvider } from "./formatter";
 
 
 export function activate(context: vscode.ExtensionContext) {
-	
+
 	// ---- Formatters ---- //
 	const formatter = new AngelscriptClangDocumentFormattingEditProvider(context);
 
@@ -20,7 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// ---- Commands ---- //
 	context.subscriptions.push(
 		vscode.commands.registerCommand("unreal-angelscript-clang-format.generate-config-file", () => {
-			generateConfig.generateConfigFile(context.extensionPath);
+			generateConfig.generateConfigFile(context.extensionUri);
 		})
 	);
 }
