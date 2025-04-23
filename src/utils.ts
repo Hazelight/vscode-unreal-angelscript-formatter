@@ -65,13 +65,7 @@ export function getDefaultStyleFilepath(extensionPath: string) {
  * @param extensionPath The extension's installation path
  */
 export function getClangStyle(extensionPath: string) {
-    let styleFilepath = getConfigPath("style");
-
-    // TODO: Warn user if style file doesn't exist
-    if (!styleFilepath || !fs.existsSync(styleFilepath)) {
-        styleFilepath = getDefaultStyleFilepath(extensionPath);
-    }
-
+    const styleFilepath = getConfigPath("style") || getDefaultStyleFilepath(extensionPath);
     return `file:${styleFilepath}`;
 }
 

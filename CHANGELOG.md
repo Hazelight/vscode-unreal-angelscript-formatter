@@ -4,6 +4,7 @@
 
 - Output log is now of type `LogOutputChannel`, leading to improved readability
 - Fixed BraceWrapping: AfterFunction rule not working [#5](https://github.com/Hazelight/vscode-unreal-angelscript-formatter/issues/5)
+- If `unreal-angelscript-clang-format.style` is set to an invalid filepath the extension will now show an error message instead of falling back to the default style
 
 ## [0.1.5] - 2024-04-23
 
