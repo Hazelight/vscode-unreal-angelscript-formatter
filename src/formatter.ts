@@ -45,7 +45,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
 
         const startLineText = startLine.text;
         const startLineTextEdited = startLineText.slice(0, editRange.start.character) + edit.text + startLineText.slice(editRange.end.character);
-        
+
         if (editRange.isSingleLine) {
             // Prevent certain spaces from being added
             if (edit.length === 0 && edit.text === " ") {
@@ -72,20 +72,19 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                 return false;
             }
 
-
             // Prevent new lines after these keywords
             for (const keyword of this.memberKeywords) {
-                const regex = new RegExp(`^\s*${keyword}\\s`);
-                if (editRange.isSingleLine && regex.test(startLineText) && edit.text.includes("\n")) {
+                if (startLineText.match(new RegExp(`^\\s*${keyword}\\s`)) &&
+                    startLineTextEdited.match(new RegExp(`^\\s*${keyword}\r?\n`))) {
                     return false;
                 }
             }
         }
-    
+
         // Don't format access: lines, these are a bit special
         if (startLineText.trim().match(/^\s*access\s*:/))
             return false;
-        
+
         return true;
     }
 
