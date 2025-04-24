@@ -1,10 +1,11 @@
 // Place your settings in this file to overwrite default and user settings.
 {
     "files.exclude": {
-        "out": true,
+        // "out": true,
         "node_modules": true,
         "dist": true,
         "LICENSE": true,
+        ".vscode-test": true
     },
     "search.exclude": {
         "out": true
