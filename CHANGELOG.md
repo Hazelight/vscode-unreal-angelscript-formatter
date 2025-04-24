@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.0.0] - UNRELEASED
+## [1.0.0] - 2025-04-24
 
 - Added support for multi-root workspaces
 - Output log is now of type `LogOutputChannel`, leading to improved readability

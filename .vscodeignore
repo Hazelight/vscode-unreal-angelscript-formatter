@@ -1,6 +1,9 @@
 .vscode/**
 .vscode-test/**
 src/**
+out/**
+test/**
+.vscode-test.mjs
 .gitignore
 .yarnrc
 **/tsconfig.json
