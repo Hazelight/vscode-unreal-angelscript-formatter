@@ -7,8 +7,8 @@ import { AngelscriptClangDocumentFormattingEditProvider } from '../formatter';
 
 suite('Apply Formatting', () => {
     const currentDir = vscode.Uri.file(__dirname);
-    const formattedFilepath = vscode.Uri.joinPath(currentDir, "..", "..", "test", "fixture", "formatted.as");
-    const unformattedFilepath = vscode.Uri.joinPath(currentDir, "..", "..", "test", "fixture", "unformatted.as");
+    const formattedFilepath = vscode.Uri.joinPath(currentDir, "..", "..", "test", "fixture", "fixture-formatted.as");
+    const unformattedFilepath = vscode.Uri.joinPath(currentDir, "..", "..", "test", "fixture", "fixture-unformatted.as");
 
     let extensionContext: any
     let document: vscode.TextDocument

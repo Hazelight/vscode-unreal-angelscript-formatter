@@ -35,7 +35,7 @@ class Class : ParentClass
 		else
 		{
 			Print(f"{TestVar1}");
-		} 
+		}
 	}
 
 	private void PrivateFunc()

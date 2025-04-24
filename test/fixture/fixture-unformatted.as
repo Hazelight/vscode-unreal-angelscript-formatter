@@ -27,7 +27,7 @@ UPROPERTY (NotEditable,  BlueprintReadOnly,Category="Test", meta=( DisplayName="
    // Comment
 	if ( TestVar1 == 5 ) {
 		TestVar1 = 10;
-	} else  { Print( f"{TestVar1}" ); }}
+	} else  { Print( f"{TestVar1}" );}}
 
 
 	private void PrivateFunc()
