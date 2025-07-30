@@ -19,7 +19,7 @@ interface IEditInfo {
 
 export class AngelscriptClangDocumentFormattingEditProvider implements vscode.DocumentFormattingEditProvider, vscode.DocumentRangeFormattingEditProvider {
 
-    private readonly memberKeywords = ["private", "protected", "delegate", "event"];
+    private readonly keywordsRequiringIdentifiers = ["private", "protected", "delegate", "event"]; 
 
     constructor(
         private readonly context: vscode.ExtensionContext
@@ -72,10 +72,14 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                 return false;
             }
 
-            // Prevent new lines after these keywords
-            for (const keyword of this.memberKeywords) {
-                if (startLineText.match(new RegExp(`^\\s*${keyword}\\s`)) &&
-                    startLineTextEdited.match(new RegExp(`^\\s*${keyword}\r?\n`))) {
+            // Prevent new lines breaking up the 'keyword type name'
+            for (const keyword of this.keywordsRequiringIdentifiers) {
+                if (startLineText.match(new RegExp(`^\\s*${keyword}\\s+\\w+`)) &&
+                    (
+                        startLineTextEdited.match(new RegExp(`^\\s*${keyword}\r?\n`)) ||
+                        startLineTextEdited.match(new RegExp(`^\\s*${keyword}\\s+\\w+\r?\n`))
+                    )
+                ) {
                     return false;
                 }
             }
