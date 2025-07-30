@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.0.1] - 2025-07-30
+- Fixed unwanted linebreak being inserted between `event`/`delegate` type and name [#7](https://github.com/Hazelight/vscode-unreal-angelscript-formatter/issues/7)
+
 ## [1.0.0] - 2025-04-24
 
 - Added support for multi-root workspaces

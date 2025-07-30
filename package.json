@@ -3,7 +3,7 @@
   "displayName": "Unreal AngelScript Clang-Format",
   "description": "Format Unreal Engine AngelScript code using Clang-Format",
   "publisher": "Hazelight",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "icon": "resources/icon.png",
   "engines": {
     "vscode": "^1.77.0"
