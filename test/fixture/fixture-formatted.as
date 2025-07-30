@@ -1,5 +1,11 @@
 int TestVar = 5;
 
+enum ETest
+{
+	itemOne,
+	itemTwo
+}
+
 event void FEventExample(UObject Object, float Value);
 delegate bool FDelegateExample(FVector& OutLocation);
 
