@@ -11,12 +11,14 @@ Or `Format Selection` _(Default Shortcut: <kbd>Ctrl</kbd> + <kbd>K</kbd> <kbd>Ct
 
 <br>
 
-## Setup
+## Style Configuration
 
-1. Set the configuration [unreal-angelscript-clang-format.executable](vscode://settings/unreal-angelscript-clang-format.executable) to point to a __clang-format.exe__ executable.
+1. Create a [.clang-format](https://clang.llvm.org/docs/ClangFormatStyleOptions.html) file with your formatting preferences
+    * You can generate a starter file using the command: `Unreal AngelScript Clang-Format: Generate Config File`
+2. Set [unreal-angelscript-clang-format.style](vscode://settings/unreal-angelscript-clang-format.style) in VS Code to the path of your .clang-format file
 
-2. Optionally create a [.clang-format](https://clang.llvm.org/docs/ClangFormatStyleOptions.html) file containing your preferences and set the configuration [unreal-angelscript-clang-format.style](vscode://settings/unreal-angelscript-clang-format.style) to point to that file.
-You can generate a .clang-format file by running the VS Code command: **"Unreal AngelScript Clang-Format: Generate Config File"**
+<br>
 
-Note: Paths can be either absolute or relative to the workspace.
+## Issues
 
+If you encounter any issues, or have any feedback, please open an issue on the [GitHub repository](https://github.com/Hazelight/vscode-unreal-angelscript-formatter)

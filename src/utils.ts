@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
+import { clangFormatPath } from 'clang-format-node';
 
 export const EXTENSION_ID = "unreal-angelscript-clang-format";
 export const EXECUTABLE_CONFIG_KEY = 'executable';
@@ -84,8 +85,8 @@ export function getClangStyle(extensionPath: vscode.Uri) {
 export function getClangExecutable() {
     let clangExecutable = getConfigPath(EXECUTABLE_CONFIG_KEY);
     if (!clangExecutable) {
-        // If user hasn't set a path, assume clang-format is in the PATH
-        return "clang-format";
+        // If user hasn't set a path, use the clang-format that ships with the extension
+        return clangFormatPath;
     }
 
     if (fs.existsSync(clangExecutable)) {
