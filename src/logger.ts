@@ -10,8 +10,8 @@ export class Logger {
         return this._outputChannel;
     }
 
-    public static log(message: string) {
-        this.outputChannel.appendLine(message);
+    public static info(message: string) {
+        this.outputChannel.info(message);
     }
 
     /**

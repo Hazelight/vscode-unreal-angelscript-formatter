@@ -40,7 +40,7 @@ export async function generateConfigFile(extensionUri: vscode.Uri) {
             return;
     }
 
-    Logger.log(`Copying ${defaultStyle.fsPath} to ${destFilepath.fsPath}`);
+    Logger.info(`Copying ${defaultStyle.fsPath} to ${destFilepath.fsPath}`);
 
     try {
         await vscode.workspace.fs.copy(defaultStyle, destFilepath, { overwrite: true });

@@ -244,7 +244,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                 workingPath = path.dirname(document.fileName);
             }
 
-            Logger.log(`Running "${clangExecutable}" with arguments:\n${clangFormatArguments.join("\n")}`);
+            Logger.info(`Running "${clangExecutable}" with arguments:\n${clangFormatArguments.join("\n")}`);
 
             let stdout = "";
             let stderr = "";
@@ -269,7 +269,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                         }
                     });
 
-                    Logger.log(err.message);
+                    Logger.info(err.message);
                     return reject("No clang-format executable");
                 }
 
@@ -288,7 +288,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
 
                     if (exitCode !== 0) {
                         if (bHasShownError)
-                            Logger.log(`clang-format exited with code ${exitCode}`);
+                            Logger.info(`clang-format exited with code ${exitCode}`);
                         else
                             Logger.showErrorMessage(POPUP_ERROR_MESSAGE, Error(`clang-format exited with code ${exitCode}`));
 
