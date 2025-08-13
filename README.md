@@ -21,4 +21,4 @@ Or `Format Selection` _(Default Shortcut: <kbd>Ctrl</kbd> + <kbd>K</kbd> <kbd>Ct
 
 ## Issues
 
-If you encounter any issues, or have any feedback, please open an issue on the [GitHub repository](https://github.com/Hazelight/vscode-unreal-angelscript-formatter)
+If you encounter any issues, or have any feedback, please open an issue on the [GitHub repository](https://github.com/Hazelight/vscode-unreal-angelscript-formatter/issues)
