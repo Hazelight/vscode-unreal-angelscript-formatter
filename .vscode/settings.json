@@ -4,7 +4,7 @@
         // "out": true,
         "node_modules": true,
         "dist": true,
-        "LICENSE": true,
+        "LICENSE*": true,
         ".vscode-test": true
     },
     "search.exclude": {
