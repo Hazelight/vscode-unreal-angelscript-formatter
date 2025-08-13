@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.0.0] - 2025-08-13
+- clang-format now comes bundled with the extension
+    - The extension defaults to the bundled clang-format when `unreal-angelscript-clang-format.executable` is not specified
+
 ## [1.0.1] - 2025-07-30
 - Fixed unwanted linebreak being inserted between `event`/`delegate` type and name [#7](https://github.com/Hazelight/vscode-unreal-angelscript-formatter/issues/7)
 
