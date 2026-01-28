@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import * as child_process from 'child_process';
 import * as path from 'path';
 
+import * as typeFormatter from './typeFormatter';
 import * as utils from './utils';
 import { Logger } from './logger';
 
@@ -17,9 +18,9 @@ interface IEditInfo {
 }
 
 
-export class AngelscriptClangDocumentFormattingEditProvider implements vscode.DocumentFormattingEditProvider, vscode.DocumentRangeFormattingEditProvider {
+export class AngelscriptClangDocumentFormattingEditProvider implements vscode.DocumentFormattingEditProvider, vscode.DocumentRangeFormattingEditProvider, vscode.OnTypeFormattingEditProvider {
 
-    private readonly keywordsRequiringIdentifiers = ["private", "protected", "delegate", "event"]; 
+    private readonly keywordsRequiringIdentifiers = ["private", "protected", "delegate", "event"];
 
     constructor(
         private readonly context: vscode.ExtensionContext
@@ -31,6 +32,33 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
 
     public provideDocumentRangeFormattingEdits(document: vscode.TextDocument, range: vscode.Range, options: vscode.FormattingOptions, token: vscode.CancellationToken): Thenable<vscode.TextEdit[]> {
         return this.formatDocument(document, range, options, token);
+    }
+
+    public provideOnTypeFormattingEdits(document: vscode.TextDocument, position: vscode.Position, ch: string, options: vscode.FormattingOptions, token: vscode.CancellationToken): Thenable<vscode.TextEdit[]> {
+        let range: vscode.Range | null = null;
+
+        switch (ch) {
+            case "\n":
+                range = typeFormatter.onTypeFormattingNewLine(document, position);
+                break;
+            default:
+                return Promise.resolve([]);
+        }
+
+        if (range === null) {
+            return Promise.resolve([]);
+        }
+
+        return new Promise((resolve, reject) => {
+            this.formatDocument(document, range, options, token).then(edits => {
+                // Only allow edits with the given range
+                const filteredEdits = edits.filter(edit =>
+                    range.contains(edit.range)
+                );
+
+                resolve(filteredEdits);
+            });
+        });
     }
 
     /**

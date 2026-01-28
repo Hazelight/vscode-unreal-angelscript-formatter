@@ -17,6 +17,14 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.languages.registerDocumentRangeFormattingEditProvider("angelscript", formatter)
 	);
 
+	context.subscriptions.push(
+		vscode.languages.registerOnTypeFormattingEditProvider(
+			"angelscript",
+			formatter,
+			"\n"
+		)
+	);
+
 	// ---- Commands ---- //
 	context.subscriptions.push(
 		vscode.commands.registerCommand("unreal-angelscript-clang-format.generate-config-file", () => {
