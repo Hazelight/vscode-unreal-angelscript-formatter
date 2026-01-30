@@ -1,7 +1,11 @@
 # Change Log
 
+## [3.0.0] - 2026-01-30
+- Updated bundled clang-format binaries to version 21.1.8
+- Added initial support for `editor.formatOnType`
+
 ## [2.0.0] - 2025-08-13
-- clang-format now comes bundled with the extension
+- clang-format (19.1.7) now comes bundled with the extension
     - The extension defaults to the bundled clang-format when `unreal-angelscript-clang-format.executable` is not specified
 
 ## [1.0.1] - 2025-07-30
