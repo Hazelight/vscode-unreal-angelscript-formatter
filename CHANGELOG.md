@@ -1,5 +1,19 @@
 # Change Log
 
+## [3.1.0] - 2026-02-02
+- Added more formatOnType triggers to allow it to:
+    - Add spaces between control flow statements and opening parenthesis `if(` -> `if (`
+    - Indent line when adding a newline before an argument/condition:
+        ```angelscript
+        if (condition1 &&
+        condition2) {}
+
+        // ->
+
+        if (condition1 &&
+            condition2) {}
+        ```
+
 ## [3.0.0] - 2026-01-30
 - Updated bundled clang-format binaries to version 21.1.8
 - Added initial support for `editor.formatOnType`
