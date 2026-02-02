@@ -21,7 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.languages.registerOnTypeFormattingEditProvider(
 			"angelscript",
 			formatter,
-			"\n"
+			"\n", "("
 		)
 	);
 

@@ -35,25 +35,28 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
     }
 
     public provideOnTypeFormattingEdits(document: vscode.TextDocument, position: vscode.Position, ch: string, options: vscode.FormattingOptions, token: vscode.CancellationToken): Thenable<vscode.TextEdit[]> {
-        let range: vscode.Range | null = null;
+        let editRequest: typeFormatter.IFormattingEdit | null = null;
 
         switch (ch) {
             case "\n":
-                range = typeFormatter.onTypeFormattingNewLine(document, position);
+                editRequest = typeFormatter.onTypeFormattingNewLine(document, position);
+                break;
+            case "(":
+                editRequest = typeFormatter.onTypeFormattingOpenParentheses(document, position);
                 break;
             default:
                 return Promise.resolve([]);
         }
 
-        if (range === null) {
+        if (editRequest === null) {
             return Promise.resolve([]);
         }
 
         return new Promise((resolve, reject) => {
-            this.formatDocument(document, range, options, token).then(edits => {
+            this.formatDocument(document, editRequest.range, options, token).then(edits => {
                 // Only allow edits with the given range
                 const filteredEdits = edits.filter(edit =>
-                    range.contains(edit.range)
+                    editRequest.range.contains(edit.range) && (!editRequest.validator || editRequest.validator(document, edit))
                 );
 
                 resolve(filteredEdits);
@@ -149,17 +152,17 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                 const length = editInfo.length;
 
                 if (offset >= codeByteOffsetCache.byte) {
-                    editInfo.offset = codeByteOffsetCache.offset + documentTextBuffer.slice(codeByteOffsetCache.byte, offset).toString("utf8").length;
+                    editInfo.offset = codeByteOffsetCache.offset + documentTextBuffer.subarray(codeByteOffsetCache.byte, offset).toString("utf8").length;
                     codeByteOffsetCache.byte = offset;
                     codeByteOffsetCache.offset = editInfo.offset;
                 }
                 else {
-                    editInfo.offset = documentTextBuffer.slice(0, offset).toString("utf8").length;
+                    editInfo.offset = documentTextBuffer.subarray(0, offset).toString("utf8").length;
                     codeByteOffsetCache.byte = offset;
                     codeByteOffsetCache.offset = editInfo.offset;
                 }
 
-                editInfo.length = documentTextBuffer.slice(offset, offset + length).toString("utf8").length;
+                editInfo.length = documentTextBuffer.subarray(offset, offset + length).toString("utf8").length;
 
                 return editInfo;
             };
@@ -314,7 +317,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
                         return reject(stderr);
                     }
 
-                    if (exitCode !== 0) {
+                    if (exitCode !== 0 && exitCode !== null) {
                         if (bHasShownError)
                             Logger.info(`clang-format exited with code ${exitCode}`);
                         else
@@ -332,6 +335,7 @@ export class AngelscriptClangDocumentFormattingEditProvider implements vscode.Do
             if (token) {
                 token.onCancellationRequested(() => {
                     clangProcess.kill();
+                    Logger.info("Clang-format process canceled");
                     reject("Cancelation requested");
                 });
             }
